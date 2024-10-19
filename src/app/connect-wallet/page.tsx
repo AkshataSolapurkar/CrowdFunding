@@ -9,9 +9,10 @@ const ConnectWallet = () => {
     const router = useRouter();
 
     const handleConnect = async () => {
+        console.log("clicked")
         await connectWallet();
         if (walletConnected) {
-            router.push('/dashboard'); // Redirect to the dashboard/main page
+            router.push('/'); // Redirect to the dashboard/main page
         }
     };
 

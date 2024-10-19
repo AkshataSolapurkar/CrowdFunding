@@ -70,6 +70,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             
             // If successful, get the user data
             const userData = await account.get();
+            document.cookie = `token=${session.$id}; path=/; secure; samesite=strict`;
+
             setUser({ email: userData.email, id: userData.$id });
             alert('login successful')
             console.log('Login successful');
@@ -94,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             // Create the user account with email
             const newUser = await account.create(ID.unique(), email, password);
+            console.log(newUser)
             
             // Try to delete any existing session before login
             try {
@@ -114,9 +117,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const connectWallet = async () => {
+        console.log("initiallize")
         if (typeof window !== 'undefined' && window.ethereum) {
+            console.log("started")
             try {
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("awaait")
                 setWalletConnected(true);
                 console.log('Wallet connected');
             } catch (error: any) {

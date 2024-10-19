@@ -1,42 +1,34 @@
 // src/middleware.ts
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import type { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-    const token = await getToken({ req });
+export function middleware(req: NextRequest) {
+    const token = req.cookies.get('token')?.value;
 
-    // Define paths
     const loginPath = '/login';
     const signupPath = '/signup';
-    const mainPath = '/'; // The main page
+    const mainPath = '/'; // Main page for authenticated users
 
-    // If the user is not authenticated
     if (!token) {
         // Allow access to login and signup pages
         if (req.nextUrl.pathname === loginPath || req.nextUrl.pathname === signupPath) {
             return NextResponse.next();
         }
-        
+
         // Redirect unauthenticated users to the login page if accessing other routes
         return NextResponse.redirect(new URL(loginPath, req.url));
     } else {
-        // User is authenticated
+        // User is authenticated, redirect to main page if accessing login/signup
         if (req.nextUrl.pathname === loginPath || req.nextUrl.pathname === signupPath) {
-            // Redirect authenticated users to the main page
             return NextResponse.redirect(new URL(mainPath, req.url));
         }
     }
 
-    // Allow access to the requested page if none of the above conditions are met
+    // Allow access to the requested page if authenticated
     return NextResponse.next();
 }
 
-// Specify the paths to apply the middleware
+// Apply middleware to specific paths
 export const config = {
-    matcher: [
-        '/login',
-        '/signup',
-        '/',
-    ],
+    matcher: ['/login', '/signup', '/'],
 };
