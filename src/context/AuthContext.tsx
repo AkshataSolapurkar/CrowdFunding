@@ -1,6 +1,7 @@
 "use client"
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Client, Account, ID } from 'appwrite';
+import { ethers } from 'ethers';
 
 
 // Initialize Appwrite client
@@ -19,6 +20,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
+    walletAddress: string | null; // Add this to store the wallet address
     login: (email: string, password: string) => Promise<void>;
     signup: (email: string, password: string) => Promise<void>;
     connectWallet: () => Promise<void>;
@@ -40,6 +42,7 @@ const generateValidUserId = (email: string): string => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [walletConnected, setWalletConnected] = useState(false);
+    const [walletAddress, setWalletAddress] = useState<string | null>(null); // State for wallet address
 
     useEffect(() => {
         checkUser();
@@ -121,10 +124,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (typeof window !== 'undefined' && window.ethereum) {
             console.log("started")
             try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                console.log("awaait")
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
                 setWalletConnected(true);
-                console.log('Wallet connected');
+                setWalletAddress(address);
             } catch (error: any) {
                 console.error('Wallet connection error', error);
                 alert('Could not connect wallet: ' + error.message);
@@ -139,6 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await account.deleteSession('current');
             setUser(null);
             setWalletConnected(false);
+            setWalletAddress(null); // Clear wallet address on logout
             console.log('User logged out');
         } catch (error: any) {
             console.error('Logout error', error);
@@ -148,6 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const contextValue: AuthContextType = {
         user,
+        walletAddress,
         login,
         signup,
         connectWallet,

@@ -1,27 +1,19 @@
-// src/app/connect-wallet/page.tsx
+import React from 'react';
+import { useAuth } from '@/context/AuthContext';
 
-"use client"
-import { useAuth } from '../../context/AuthContext';
-import { useRouter } from 'next/navigation';
+const WalletConnection: React.FC = () => {
+  const { walletConnected, walletAddress } = useAuth();
 
-const ConnectWallet = () => {
-    const { connectWallet, walletConnected } = useAuth();
-    const router = useRouter();
-
-    const handleConnect = async () => {
-        console.log("clicked")
-        await connectWallet();
-        if (walletConnected) {
-            router.push('/'); // Redirect to the dashboard/main page
-        }
-    };
-
-    return (
-        <div>
-            <h1>Connect Your Wallet</h1>
-            <button onClick={handleConnect}>Connect MetaMask</button>
-        </div>
-    );
+  return (
+    <nav>
+      <p>My Navbar</p>
+      {walletConnected ? (
+        <p>Wallet Connected: {walletAddress}</p>
+      ) : (
+        <p>Wallet not connected</p>
+      )}
+    </nav>
+  );
 };
 
-export default ConnectWallet;
+export default WalletConnection;
