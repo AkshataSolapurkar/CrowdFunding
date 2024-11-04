@@ -11,11 +11,14 @@
   "dependencies": {
     "appwrite": "^16.0.2",
     "ethers": "^5.7.2",
+    "framer-motion": "^11.11.9",
     "js-cookie": "^3.0.5",
+    "lucide-react": "^0.453.0",
     "next": "14.2.15",
     "next-auth": "^4.24.8",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "recharts": "^2.13.0"
   },
   "devDependencies": {
     "@thirdweb-dev/react": "^4.9.4",
