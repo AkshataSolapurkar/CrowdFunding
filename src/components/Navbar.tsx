@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const Navbar: React.FC = () => {
     const { user, walletConnected, walletAddress, connectWallet, logout } = useAuth();
     const [isEmailPopupOpen, setIsEmailPopupOpen] = useState(false);
     const [isWalletPopupOpen, setIsWalletPopupOpen] = useState(false);
+    const router = useRouter();
 
     const toggleEmailPopup = () => {
         setIsEmailPopupOpen(prev => !prev);
@@ -20,6 +22,14 @@ const Navbar: React.FC = () => {
         setIsEmailPopupOpen(false);
         setIsWalletPopupOpen(false);
     };
+    const handleLogout = async () => {
+        try {
+          await logout();
+          router.push('/login'); // Redirect to login page after logout
+        } catch (error) {
+          console.error("Failed to logout:", error);
+        }
+      };
 
     return (
         <nav className="bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg py-3 transition duration-300 ease-in-out">
@@ -52,7 +62,7 @@ const Navbar: React.FC = () => {
                             </div>
                             {/* Email Popup */}
                             {isEmailPopupOpen && (
-                                <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+                                <div className="fixed z-50 inset-0 flex justify-center items-center bg-black bg-opacity-50">
                                     <div className="bg-white rounded-md p-4 relative transition-transform duration-300 transform hover:scale-105">
                                         <button 
                                             className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
@@ -61,6 +71,7 @@ const Navbar: React.FC = () => {
                                             &times; {/* Close button */}
                                         </button>
                                         <p className="text-gray-800">Email: {user.email}</p>
+
                                         <button
                                             onClick={logout}
                                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition-colors duration-300 focus:outline-none mt-4"
@@ -72,9 +83,11 @@ const Navbar: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        <Link href="/login">
-                            <p className="text-white hover:text-gray-200 transition-colors duration-300 transform hover:scale-105">Login</p>
-                        </Link>
+                        <Link href="/login" passHref>
+                        <p className="text-white hover:text-gray-200 transition-colors duration-300 transform hover:scale-105">
+                          Login
+                        </p>
+                      </Link>
                     )}
 
                     {/* Wallet Connection */}

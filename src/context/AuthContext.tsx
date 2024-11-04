@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Client, Account, ID } from 'appwrite';
 import { ethers } from 'ethers';
+import { destroyCookie } from 'nookies';
 
 
 // Initialize Appwrite client
@@ -42,7 +43,8 @@ const generateValidUserId = (email: string): string => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [walletConnected, setWalletConnected] = useState(false);
-    const [walletAddress, setWalletAddress] = useState<string | null>(null); // State for wallet address
+    const [walletAddress, setWalletAddress] = useState<string | null>(null); 
+    const [walletLoading, setWalletLoading] = useState(false);// State for wallet address
 
     useEffect(() => {
         checkUser();
@@ -120,22 +122,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const connectWallet = async () => {
-        console.log("initiallize")
-        if (typeof window !== 'undefined' && window.ethereum) {
-            console.log("started")
-            try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                const signer = provider.getSigner();
-                const address = await signer.getAddress();
-                setWalletConnected(true);
-                setWalletAddress(address);
-            } catch (error: any) {
-                console.error('Wallet connection error', error);
-                alert('Could not connect wallet: ' + error.message);
-            }
-        } else {
+        if (typeof window === 'undefined' || !window.ethereum) {
             alert('Please install MetaMask!');
+            return;
+        }
+
+        // Prevent multiple requests
+        if (walletLoading) {
+            return; // Exit if already connecting
+        }
+
+        setWalletLoading(true); // Set loading state
+
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // Check if already connected
+            const accounts = await provider.listAccounts();
+            if (accounts.length > 0) {
+                // If accounts exist, set the address and connected state
+                setWalletAddress(accounts[0]);
+                setWalletConnected(true);
+                return;
+            }
+
+            // Request account access if no accounts are connected
+            await provider.send("eth_requestAccounts", []);
+
+            // Get the connected account address
+            const signer = provider.getSigner();
+            const address = await signer.getAddress();
+            setWalletConnected(true);
+            setWalletAddress(address);
+        } catch (error: any) {
+            console.error('Wallet connection error:', error);
+            alert('Could not connect wallet: ' + error.message);
+        } finally {
+            setWalletLoading(false); // Reset loading state
         }
     };
 
@@ -144,13 +167,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await account.deleteSession('current');
             setUser(null);
             setWalletConnected(false);
-            setWalletAddress(null); // Clear wallet address on logout
+            setWalletAddress(null);
+            destroyCookie(null, 'token'); // Clears the 'token' cookie
+            
             console.log('User logged out');
         } catch (error: any) {
             console.error('Logout error', error);
             alert('Logout failed: ' + error.message);
         }
     };
+
+
 
     const contextValue: AuthContextType = {
         user,
