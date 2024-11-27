@@ -41,9 +41,26 @@ interface Campaign {
   fundGoal: number
   fundRaised: number
   user_id: string
+  donations:[]
 }
 
 export default function CampaignsPage() {
+  const dummycampaigns = [
+    {
+      $id: "1",
+      title: "Save the Oceans",
+      description: "Help us clean the ocean and protect marine life.",
+      status: true,
+      endDate: "2024-12-31",
+      user_id: "User123",
+      fundRaised: 0.1,
+      fundGoal: 1,
+      donations: [
+        { walletAddress: '0x1234...abcd', amount: 0.1, currency: 'MATIC' },
+      ],
+    },
+  ]
+
   const [donationAmount, setDonationAmount] = useState('');
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [isPopupOpen, setPopupOpen] = useState(false)
@@ -276,79 +293,145 @@ export default function CampaignsPage() {
             </motion.div>
           ))}
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {dummycampaigns.map((campaign) => (
+        <motion.div
+          key={campaign.$id}
+          className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition duration-300 border border-gray-200 border-opacity-50"
+          onClick={() => handleCampaignClick(campaign)}
+          whileHover={{ scale: 1.03, rotateY: 5 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">{campaign.title}</h2>
+          <p className="text-2xl font-bold text-gray-800 mb-3">{campaign.description}</p>
+          <p className={`text-sm ${campaign.status ? "text-green-500" : "text-red-500"} font-medium mb-2`}>
+            {campaign.status ? 'Active' : 'Inactive'}
+          </p>
+          <p className="text-gray-600 mb-2">Ends: {new Date(campaign.endDate).toLocaleDateString()}</p>
+          <p className="text-gray-600">Created by: {campaign.user_id}</p>
+          <p className="text-gray-600">Campaign ID: {campaign.$id}</p>
+          <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+              style={{ width: `${(campaign.fundRaised / campaign.fundGoal) * 100}%` }}
+            ></div>
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            ${campaign.fundRaised.toFixed(2)} / ${campaign.fundGoal.toFixed(2)} raised
+          </p>
+        </motion.div>
+      ))}
+       </div>
+        
       </div>
 
       <AnimatePresence>
-    {isPopupOpen && selectedCampaign && (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-        >
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotateX: -15 }}
-                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                exit={{ opacity: 0, scale: 0.9, rotateX: 15 }}
-                className="bg-white bg-opacity-90 backdrop-filter backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-2xl"
-            >
-                <button onClick={closePopup} className="float-right text-gray-500 hover:text-gray-700">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedCampaign.description}</h2>
-                <p className={`text-sm ${selectedCampaign.status ? "text-green-500" : "text-red-500"} font-medium mb-3`}>
-                    {selectedCampaign.status ? "Active" : "Inactive"}
-                </p>
-                <p className="text-gray-700 mb-3">
-                    <span className="font-medium">End Date:</span> {new Date(selectedCampaign.endDate).toLocaleDateString()}
-                </p>
-                <p className="text-gray-700 mb-3">
-                    <span className="font-medium">Fund Goal:</span> ${selectedCampaign.fundGoal.toFixed(2)}
-                </p>
-                <p className="text-gray-700 mb-3">
-                    <span className="font-medium">Fund Raised:</span> ${selectedCampaign.fundRaised.toFixed(2)}
-                </p>
-                <p className="text-gray-700 mb-4">
-                    <span className="font-medium">Created by:</span> {selectedCampaign.user_id}
-                </p>
-                <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
-                        style={{ width: `${(selectedCampaign.fundRaised / selectedCampaign.fundGoal) * 100}%` }}
-                    ></div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2 text-center">
-                    {((selectedCampaign.fundRaised / selectedCampaign.fundGoal) * 100).toFixed(2)}% funded
-                </p>
-
-                {/* Fund this Campaign Section */}
-                <div className="mt-6">
-    <label className="block mb-2 text-gray-700">Donation Amount:</label>
-    <input 
-        type="number"
-        placeholder="Enter amount"
-        value={donationAmount} // Assume you have this state
-        onChange={(e) => setDonationAmount(e.target.value)} // Update the state on change
-        className="w-full p-2 border border-gray-300 rounded"
-    />
-    <label className="flex items-center mb-4 mt-4">
-        <input type="checkbox" className="mr-2" />
-        <span className="text-gray-700">I believe in this campaign</span>
-    </label>
-    <button 
-        className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition duration-300"
-        onClick={() => fundCampaign(selectedCampaign.$id, donationAmount)}
+  {isPopupOpen && selectedCampaign && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
-        Fund this Campaign
-    </button>
-</div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, rotateX: -15 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+        exit={{ opacity: 0, scale: 0.9, rotateX: 15 }}
+        className="bg-white bg-opacity-90 backdrop-filter backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-2xl"
+      >
+        <button onClick={closePopup} className="float-right text-gray-500 hover:text-gray-700">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedCampaign.description}</h2>
+        <p className={`text-sm ${selectedCampaign.status ? "text-green-500" : "text-red-500"} font-medium mb-3`}>
+          {selectedCampaign.status ? "Active" : "Inactive"}
+        </p>
+        <p className="text-gray-700 mb-3">
+          <span className="font-medium">End Date:</span> {new Date(selectedCampaign.endDate).toLocaleDateString()}
+        </p>
+        <p className="text-gray-700 mb-3">
+          <span className="font-medium">Fund Goal:</span> {selectedCampaign.fundGoal.toFixed(2)}
+        </p>
+        <p className="text-gray-700 mb-3">
+          <span className="font-medium">Fund Raised:</span> {selectedCampaign.fundRaised.toFixed(2)}
+        </p>
+        <p className="text-gray-700 mb-4">
+          <span className="font-medium">Created by:</span> {selectedCampaign.user_id}
+        </p>
+        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+            style={{ width: `{(selectedCampaign.fundRaised / selectedCampaign.fundGoal) * 100}%` }}
+          ></div>
+        </div>
+        <p className="text-sm text-gray-600 mt-2 text-center">
+          {((selectedCampaign.fundRaised / selectedCampaign.fundGoal) * 100).toFixed(2)}% funded
+        </p>
 
-            </motion.div>
-        </motion.div>
-    )}
+        {/* Fund this Campaign Section */}
+        <div className="mt-6">
+          <label className="block mb-2 text-gray-700">Donation Amount:</label>
+          <input 
+            type="number"
+            placeholder="Enter amount"
+            value={donationAmount} // Assume you have this state
+            onChange={(e) => setDonationAmount(e.target.value)} // Update the state on change
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+          <label className="flex items-center mb-4 mt-4">
+            <input type="checkbox" className="mr-2" />
+            <span className="text-gray-700">I believe in this campaign</span>
+          </label>
+          <button 
+            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition duration-300"
+            onClick={() => fundCampaign(selectedCampaign.$id, donationAmount)}
+          >
+            Fund this Campaign
+          </button>
+        </div>
+
+        {/* Donations Table */}
+        {selectedCampaign.donations && selectedCampaign.donations.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Donations</h3>
+            <div className="overflow-x-auto">
+              {/* Scrollable Container */}
+              <div className="max-h-48 overflow-y-auto">
+                <table className="min-w-full bg-white">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Wallet Address
+                      </th>
+                      <th className="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount Donated
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCampaign.donations.map((donation, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {donation.walletAddress}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {donation.amount.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  )}
 </AnimatePresence>
+
 
     </div>
   )

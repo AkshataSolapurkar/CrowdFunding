@@ -6,7 +6,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
-  // Use your ERC20 token address
+  // Use your ERC20 token address //obtain this by npx hardhat node for testing
   const tokenAddress = "0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844";
 
   // Deploy the Crowdfunding contract
