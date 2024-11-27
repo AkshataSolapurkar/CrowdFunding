@@ -13,7 +13,7 @@ const Signup = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await signup(email, password);
-        router.push('/connect-wallet'); // Redirect to wallet connection page
+        router.push('/'); // Redirect to wallet connection page
     };
 
     return (
