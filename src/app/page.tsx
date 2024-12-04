@@ -56,10 +56,36 @@ export default function CampaignsPage() {
       fundRaised: 0.1,
       fundGoal: 1,
       donations: [
-        { walletAddress: '0x1234...abcd', amount: 0.1, currency: 'MATIC' },
+        { walletAddress: "0x1234...abcd", amount: 0.1, currency: "SepoliaETH." },
       ],
     },
-  ]
+    {
+      $id: "2",
+      title: "Plant Trees",
+      description: "Join us to plant trees and combat deforestation.",
+      status: false,
+      endDate: "2024-11-15",
+      user_id: "User456",
+      fundRaised: 0.5,
+      fundGoal: 2,
+      donations: [
+        { walletAddress: "0x5678...efgh", amount: 0.5, currency: "SepoliaETH." },
+      ],
+    },
+    {
+      $id: "3",
+      title: "Support Education",
+      description: "Provide education resources to underprivileged children.",
+      status: true,
+      endDate: "2025-01-10",
+      user_id: "User789",
+      fundRaised: 0.01,
+      fundGoal: 3,
+      donations: [
+        { walletAddress: "0x5A25...5B72", amount: 0.01, currency: "SepoliaETH." },
+      ],
+    },
+  ];
 
   const [donationAmount, setDonationAmount] = useState('');
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
@@ -293,6 +319,7 @@ export default function CampaignsPage() {
             </motion.div>
           ))}
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {dummycampaigns.map((campaign) => (
         <motion.div
@@ -337,7 +364,7 @@ export default function CampaignsPage() {
         initial={{ opacity: 0, scale: 0.9, rotateX: -15 }}
         animate={{ opacity: 1, scale: 1, rotateX: 0 }}
         exit={{ opacity: 0, scale: 0.9, rotateX: 15 }}
-        className="bg-white bg-opacity-90 backdrop-filter backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-2xl"
+        className="bg-white h-screen overflow-y-auto bg-opacity-90 backdrop-filter backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-2xl"
       >
         <button onClick={closePopup} className="float-right text-gray-500 hover:text-gray-700">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

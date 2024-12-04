@@ -31,18 +31,18 @@ const sidebarItems = [
 ]
 
 const barChartData = [
-  { name: 'Jan', value: 400 },
-  { name: 'Feb', value: 300 },
-  { name: 'Mar', value: 200 },
-  { name: 'Apr', value: 278 },
-  { name: 'May', value: 189 },
+  { name: 'Jul', value: 0 },
+  { name: 'Aug', value: 0 },
+  { name: 'Sept', value: 0 },
+  { name: 'Oct', value: 0 },
+  { name: 'Nov', value: 0.05 },
 ]
 
 const pieChartData = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
-  { name: 'Group C', value: 300 },
-  { name: 'Group D', value: 200 },
+  { name: 'Group A', value: 1 },
+  { name: 'Group B', value: 0 },
+  { name: 'Group C', value: 0.5 },
+  { name: 'Group D', value: 0.7 },
 ]
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
@@ -186,10 +186,10 @@ export default function Dashboard() {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: 'Total Users', value: '10,483' },
-              { label: 'Active Campaigns', value: '23' },
-              { label: 'Total Revenue', value: '$103,430' },
-              { label: 'Avg. Engagement', value: '27.5%' },
+              { label: 'Total Users', value: '2' },
+              { label: 'Active Campaigns', value: '2' },
+              { label: 'Total Revenue', value: '0.2 sepholia ETH' },
+              { label: 'Avg. Engagement', value: '0.1%' },
             ].map((stat, index) => (
               <motion.div
                 key={index}
